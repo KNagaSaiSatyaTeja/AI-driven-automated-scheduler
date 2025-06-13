@@ -210,7 +210,7 @@ export class MongoStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const hashedPassword = await bcrypt.hash(user.password, 10);
     
     const newUser = new UserModel({
@@ -231,7 +231,7 @@ export class MongoStorage implements IStorage {
 
   // Faculty methods
   async getAllFaculty(): Promise<FacultyRecord[]> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const faculty = await FacultyModel.find().lean();
     return faculty.map((f: any) => ({
       _id: f._id.toString(),
@@ -247,7 +247,7 @@ export class MongoStorage implements IStorage {
   }
 
   async createFaculty(faculty: InsertFaculty): Promise<FacultyRecord> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const newFaculty = new FacultyModel(faculty);
     const saved = await newFaculty.save();
     return {
@@ -264,7 +264,7 @@ export class MongoStorage implements IStorage {
   }
 
   async updateFaculty(id: string, faculty: Partial<InsertFaculty>): Promise<FacultyRecord | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const updated = await FacultyModel.findOneAndUpdate({ id }, faculty, { new: true }).lean();
     if (!updated) return undefined;
     
@@ -283,14 +283,14 @@ export class MongoStorage implements IStorage {
   }
 
   async deleteFaculty(id: string): Promise<boolean> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const result = await FacultyModel.deleteOne({ id });
     return result.deletedCount > 0;
   }
 
   // Subject methods
   async getAllSubjects(): Promise<SubjectRecord[]> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const subjects = await SubjectModel.find().lean();
     return subjects.map((s: any) => ({
       _id: s._id.toString(),
@@ -303,7 +303,7 @@ export class MongoStorage implements IStorage {
   }
 
   async createSubject(subject: InsertSubject): Promise<SubjectRecord> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const newSubject = new SubjectModel(subject);
     const saved = await newSubject.save();
     return {
@@ -317,7 +317,7 @@ export class MongoStorage implements IStorage {
   }
 
   async updateSubject(id: string, subject: Partial<InsertSubject>): Promise<SubjectRecord | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const updated = await SubjectModel.findByIdAndUpdate(id, subject, { new: true }).lean();
     if (!updated) return undefined;
     
@@ -332,14 +332,14 @@ export class MongoStorage implements IStorage {
   }
 
   async deleteSubject(id: string): Promise<boolean> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const result = await SubjectModel.findByIdAndDelete(id);
     return !!result;
   }
 
   // Room methods
   async getAllRooms(): Promise<Room[]> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const rooms = await RoomModel.find().lean();
     return rooms.map(r => ({
       _id: r._id.toString(),
@@ -351,7 +351,7 @@ export class MongoStorage implements IStorage {
   }
 
   async createRoom(room: InsertRoom): Promise<Room> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const newRoom = new RoomModel(room);
     const saved = await newRoom.save();
     return {
@@ -364,7 +364,7 @@ export class MongoStorage implements IStorage {
   }
 
   async updateRoom(id: string, room: Partial<InsertRoom>): Promise<Room | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const updated = await RoomModel.findOneAndUpdate({ id }, room, { new: true }).lean();
     if (!updated) return undefined;
     
@@ -378,14 +378,14 @@ export class MongoStorage implements IStorage {
   }
 
   async deleteRoom(id: string): Promise<boolean> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const result = await RoomModel.deleteOne({ id });
     return result.deletedCount > 0;
   }
 
   // Break methods
   async getAllBreaks(): Promise<Break[]> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const breaks = await BreakModel.find().lean();
     return breaks.map(b => ({
       _id: b._id.toString(),
@@ -397,7 +397,7 @@ export class MongoStorage implements IStorage {
   }
 
   async createBreak(breakPeriod: InsertBreak): Promise<Break> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const newBreak = new BreakModel(breakPeriod);
     const saved = await newBreak.save();
     return {
@@ -410,7 +410,7 @@ export class MongoStorage implements IStorage {
   }
 
   async updateBreak(id: string, breakPeriod: Partial<InsertBreak>): Promise<Break | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const updated = await BreakModel.findByIdAndUpdate(id, breakPeriod, { new: true }).lean();
     if (!updated) return undefined;
     
@@ -424,14 +424,14 @@ export class MongoStorage implements IStorage {
   }
 
   async deleteBreak(id: string): Promise<boolean> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const result = await BreakModel.findByIdAndDelete(id);
     return !!result;
   }
 
   // College time methods
   async getCollegeTime(): Promise<CollegeTimeRecord | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const collegeTime = await CollegeTimeModel.findOne().lean();
     if (!collegeTime) return undefined;
     
@@ -444,7 +444,7 @@ export class MongoStorage implements IStorage {
   }
 
   async setCollegeTime(collegeTime: InsertCollegeTime): Promise<CollegeTimeRecord> {
-    await connectToDatabase();
+    await this.initializeConnection();
     await CollegeTimeModel.deleteMany({});
     const newCollegeTime = new CollegeTimeModel(collegeTime);
     const saved = await newCollegeTime.save();
@@ -458,7 +458,7 @@ export class MongoStorage implements IStorage {
 
   // Generated schedule methods
   async saveGeneratedSchedule(name: string, scheduleData: GeneratedSchedule): Promise<void> {
-    await connectToDatabase();
+    await this.initializeConnection();
     await GeneratedScheduleModel.findOneAndUpdate(
       { name },
       { name, scheduleData },
@@ -467,21 +467,21 @@ export class MongoStorage implements IStorage {
   }
 
   async getGeneratedSchedule(name: string): Promise<GeneratedSchedule | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const schedule = await GeneratedScheduleModel.findOne({ name }).lean();
     if (!schedule) return undefined;
     return schedule.scheduleData;
   }
 
   async getAllGeneratedSchedules(): Promise<Array<{name: string; createdAt: Date}>> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const schedules = await GeneratedScheduleModel.find({}, { name: 1, createdAt: 1 }).lean();
     return schedules.map(s => ({ name: s.name, createdAt: s.createdAt }));
   }
 
   // Legacy methods (keeping existing functionality)
   async getSchedule(): Promise<Schedule | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const schedule = await ScheduleModel.findOne().sort({ created_at: -1 }).lean();
     if (!schedule || !schedule.college_time || !schedule.break_periods || !schedule.rooms || !schedule.subjects) {
       return undefined;
@@ -498,7 +498,7 @@ export class MongoStorage implements IStorage {
   }
 
   async createSchedule(insertSchedule: InsertSchedule): Promise<Schedule> {
-    await connectToDatabase();
+    await this.initializeConnection();
     await ScheduleModel.deleteMany({});
     
     const newSchedule = new ScheduleModel({

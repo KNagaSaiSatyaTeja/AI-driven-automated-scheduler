@@ -2,12 +2,18 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
 let mongoServer: MongoMemoryServer | null = null;
+let isConnected = false;
 
 export async function connectToDatabase() {
   try {
     // Check if already connected
-    if (mongoose.connection.readyState === 1) {  // 1 = connected
+    if (isConnected && mongoose.connection.readyState === 1) {
       return mongoose.connection;
+    }
+
+    // Close existing connection if any
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close();
     }
 
     // Use MongoDB Memory Server for development
@@ -30,6 +36,7 @@ export async function connectToDatabase() {
       console.log('Connected to MongoDB');
     }
 
+    isConnected = true;
     return mongoose.connection;
   } catch (error) {
     console.error('MongoDB connection error:', error);
