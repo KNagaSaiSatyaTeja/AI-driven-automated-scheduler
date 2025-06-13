@@ -1,4 +1,5 @@
-import { Schedule, InsertSchedule, ScheduleData, RoomSchedule, FacultySchedule, ScheduleInsights } from "@shared/schema";
+import { Schedule, InsertSchedule, RoomSchedule, FacultySchedule, ScheduleInsights } from "@shared/schema";
+import { connectToDatabase, ScheduleModel } from "./database";
 
 export interface IStorage {
   getSchedule(): Promise<Schedule | undefined>;
@@ -11,64 +12,100 @@ export interface IStorage {
   getAllFaculty(): Promise<Array<{ id: string; name: string }>>;
 }
 
-export class MemStorage implements IStorage {
-  private schedule: Schedule | undefined;
-  private currentId: number;
-
+export class MongoStorage implements IStorage {
   constructor() {
-    this.currentId = 1;
+    this.initializeConnection();
+  }
+
+  private async initializeConnection() {
+    await connectToDatabase();
   }
 
   async getSchedule(): Promise<Schedule | undefined> {
-    return this.schedule;
+    await connectToDatabase();
+    const schedule = await ScheduleModel.findOne().sort({ created_at: -1 }).lean();
+    if (!schedule) return undefined;
+    
+    return {
+      _id: schedule._id.toString(),
+      college_time: schedule.college_time || { startTime: '09:30', endTime: '16:30' },
+      break_periods: schedule.break_periods || [],
+      rooms: schedule.rooms || [],
+      subjects: schedule.subjects || [],
+      created_at: schedule.created_at?.toISOString(),
+    };
   }
 
   async createSchedule(insertSchedule: InsertSchedule): Promise<Schedule> {
-    const id = this.currentId++;
-    const schedule: Schedule = {
+    await connectToDatabase();
+    
+    // Delete existing schedule and create new one
+    await ScheduleModel.deleteMany({});
+    
+    const newSchedule = new ScheduleModel({
       ...insertSchedule,
-      id,
-      created_at: new Date().toISOString(),
+      created_at: new Date(),
+    });
+    
+    const savedSchedule = await newSchedule.save();
+    
+    return {
+      _id: savedSchedule._id.toString(),
+      college_time: savedSchedule.college_time || { startTime: '09:30', endTime: '16:30' },
+      break_periods: savedSchedule.break_periods || [],
+      rooms: savedSchedule.rooms || [],
+      subjects: savedSchedule.subjects || [],
+      created_at: savedSchedule.created_at?.toISOString(),
     };
-    this.schedule = schedule;
-    return schedule;
   }
 
   async updateSchedule(insertSchedule: InsertSchedule): Promise<Schedule> {
-    if (!this.schedule) {
+    await connectToDatabase();
+    
+    const existingSchedule = await ScheduleModel.findOne().sort({ created_at: -1 });
+    if (!existingSchedule) {
       return this.createSchedule(insertSchedule);
     }
     
-    const updatedSchedule: Schedule = {
-      ...this.schedule,
-      ...insertSchedule,
-      created_at: new Date().toISOString(),
+    const updatedSchedule = await ScheduleModel.findByIdAndUpdate(
+      existingSchedule._id,
+      { ...insertSchedule, created_at: new Date() },
+      { new: true }
+    );
+    
+    if (!updatedSchedule) {
+      throw new Error('Failed to update schedule');
+    }
+    
+    return {
+      _id: updatedSchedule._id.toString(),
+      college_time: updatedSchedule.college_time || { startTime: '09:30', endTime: '16:30' },
+      break_periods: updatedSchedule.break_periods || [],
+      rooms: updatedSchedule.rooms || [],
+      subjects: updatedSchedule.subjects || [],
+      created_at: updatedSchedule.created_at?.toISOString(),
     };
-    this.schedule = updatedSchedule;
-    return updatedSchedule;
   }
 
   async getRoomSchedule(roomId: string): Promise<RoomSchedule | undefined> {
-    if (!this.schedule) return undefined;
+    const schedule = await this.getSchedule();
+    if (!schedule) return undefined;
 
-    const scheduleData = this.schedule.subjects as any;
-    const rooms = this.schedule.rooms as string[];
-    
+    const rooms = schedule.rooms;
     if (!rooms.includes(roomId)) return undefined;
 
     // Generate room schedule from schedule data
-    const roomSchedule = this.generateRoomSchedule(roomId, scheduleData);
+    const roomSchedule = this.generateRoomSchedule(roomId, schedule);
     return roomSchedule;
   }
 
   async getFacultySchedule(facultyId: string): Promise<FacultySchedule | undefined> {
-    if (!this.schedule) return undefined;
+    const schedule = await this.getSchedule();
+    if (!schedule) return undefined;
 
-    const scheduleData = this.schedule.subjects as any;
-    
     // Find faculty in subjects
     let facultyName = '';
-    const subjects = scheduleData.subjects || [];
+    const subjects = schedule.subjects || [];
     
     for (const subject of subjects) {
       const faculty = subject.faculty?.find((f: any) => f.id === facultyId);
@@ -81,12 +118,13 @@ export class MemStorage implements IStorage {
     if (!facultyName) return undefined;
 
     // Generate faculty schedule
-    const facultySchedule = this.generateFacultySchedule(facultyId, facultyName, scheduleData);
+    const facultySchedule = this.generateFacultySchedule(facultyId, facultyName, schedule);
     return facultySchedule;
   }
 
   async getInsights(): Promise<ScheduleInsights> {
-    if (!this.schedule) {
+    const schedule = await this.getSchedule();
+    if (!schedule) {
       return {
         avgUtilization: 0,
         conflicts: 0,
@@ -97,13 +135,14 @@ export class MemStorage implements IStorage {
       };
     }
 
-    const scheduleData = this.schedule.subjects as any;
-    const rooms = this.schedule.rooms as string[];
-    const subjects = scheduleData.subjects || [];
+    const rooms = schedule.rooms;
+    const subjects = schedule.subjects || [];
 
     // Calculate insights
     const roomUtilization = await this.calculateRoomUtilization(rooms);
-    const avgUtilization = roomUtilization.reduce((sum, room) => sum + room.utilization, 0) / roomUtilization.length;
+    const avgUtilization = roomUtilization.length > 0 
+      ? roomUtilization.reduce((sum, room) => sum + room.utilization, 0) / roomUtilization.length 
+      : 0;
     const conflicts = await this.detectConflicts();
     const activeFaculty = this.countActiveFaculty(subjects);
     const peakTime = this.calculatePeakTime(subjects);
@@ -120,15 +159,16 @@ export class MemStorage implements IStorage {
   }
 
   async getAllRooms(): Promise<string[]> {
-    if (!this.schedule) return [];
-    return this.schedule.rooms as string[];
+    const schedule = await this.getSchedule();
+    if (!schedule) return [];
+    return schedule.rooms;
   }
 
   async getAllFaculty(): Promise<Array<{ id: string; name: string }>> {
-    if (!this.schedule) return [];
+    const schedule = await this.getSchedule();
+    if (!schedule) return [];
     
-    const scheduleData = this.schedule.subjects as any;
-    const subjects = scheduleData.subjects || [];
+    const subjects = schedule.subjects || [];
     const faculty: Array<{ id: string; name: string }> = [];
 
     for (const subject of subjects) {
@@ -399,4 +439,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new MongoStorage();

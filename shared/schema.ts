@@ -1,23 +1,42 @@
-import { pgTable, text, serial, integer, jsonb } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const schedules = pgTable("schedules", {
-  id: serial("id").primaryKey(),
-  college_time: jsonb("college_time").notNull(),
-  break_periods: jsonb("break_periods").notNull(),
-  rooms: jsonb("rooms").notNull(),
-  subjects: jsonb("subjects").notNull(),
-  created_at: text("created_at").notNull(),
+// MongoDB Schema Definitions
+export const scheduleSchema = z.object({
+  _id: z.string().optional(),
+  college_time: z.object({
+    startTime: z.string(),
+    endTime: z.string(),
+  }),
+  break_periods: z.array(z.object({
+    day: z.string(),
+    startTime: z.string(),
+    endTime: z.string(),
+  })),
+  rooms: z.array(z.string()),
+  subjects: z.array(z.object({
+    name: z.string(),
+    duration: z.number(),
+    no_of_classes_per_week: z.number(),
+    faculty: z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      availability: z.array(z.object({
+        day: z.string(),
+        startTime: z.string(),
+        endTime: z.string(),
+      })),
+    })),
+  })),
+  created_at: z.string().optional(),
 });
 
-export const insertScheduleSchema = createInsertSchema(schedules).omit({
-  id: true,
+export const insertScheduleSchema = scheduleSchema.omit({
+  _id: true,
   created_at: true,
 });
 
 export type InsertSchedule = z.infer<typeof insertScheduleSchema>;
-export type Schedule = typeof schedules.$inferSelect;
+export type Schedule = z.infer<typeof scheduleSchema>;
 
 // Detailed type definitions for the JSON structure
 export interface CollegeTime {
