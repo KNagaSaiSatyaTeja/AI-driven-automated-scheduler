@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Calendar, Users, Building, BarChart3, Upload, LogOut, Settings } from "lucide-react";
+import { Calendar, Users, Building, BarChart3, Upload, LogOut, Settings, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,18 +8,19 @@ export default function Navigation() {
   const [location] = useLocation();
   const { user, logout } = useAuth();
   
-  const navItems = [
-    { path: "/", label: "Dashboard", icon: Calendar },
-    { path: "/rooms", label: "Rooms", icon: Building },
-    { path: "/faculty", label: "Faculty", icon: Users },
-    { path: "/insights", label: "Insights", icon: BarChart3 },
-    { path: "/upload", label: "Upload", icon: Upload },
-  ];
-
-  // Add admin panel for admin users
-  if (user?.role === 'admin') {
-    navItems.push({ path: "/admin", label: "Admin Panel", icon: Settings });
-  }
+  const isAdmin = user?.role === 'admin';
+  
+  // Different navigation for admin vs user
+  const navItems = isAdmin 
+    ? [
+        { path: "/", label: "Dashboard", icon: Calendar },
+        { path: "/admin", label: "Admin Panel", icon: Settings },
+        { path: "/generate", label: "Generate Schedule", icon: Upload },
+      ]
+    : [
+        { path: "/", label: "Dashboard", icon: Eye },
+        { path: "/schedule", label: "View Schedule", icon: Calendar },
+      ];
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -58,7 +59,7 @@ export default function Navigation() {
               {user?.username} ({user?.role})
             </span>
             <ThemeToggle />
-            <Button variant="outline" size="sm" onClick={logout}>
+            <Button variant="outline" size="sm" onClick={() => logout()}>
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>

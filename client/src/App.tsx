@@ -7,14 +7,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/useAuth";
 import Navigation from "@/components/navigation";
 import Dashboard from "@/pages/dashboard";
-import Rooms from "@/pages/rooms";
-import Faculty from "@/pages/faculty";
-import Upload from "@/pages/upload";
-import Insights from "@/pages/insights";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import NotFound from "@/pages/not-found";
 import AdminPanel from "@/pages/admin-panel";
+import GenerateSchedule from "@/pages/generate-schedule";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -48,14 +45,12 @@ function Router() {
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/dashboard" component={Dashboard} />
-        <Route path="/rooms" component={Rooms} />
-        <Route path="/rooms/:id" component={Rooms} />
-        <Route path="/faculty" component={Faculty} />
-        <Route path="/faculty/:id" component={Faculty} />
-        <Route path="/upload" component={Upload} />
-        <Route path="/insights" component={Insights} />
+        <Route path="/schedule" component={Dashboard} />
         {user?.role === 'admin' && (
-          <Route path="/admin" component={AdminPanel} />
+          <>
+            <Route path="/admin" component={AdminPanel} />
+            <Route path="/generate" component={GenerateSchedule} />
+          </>
         )}
         <Route component={NotFound} />
       </Switch>
