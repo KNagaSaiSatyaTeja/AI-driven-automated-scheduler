@@ -28,7 +28,7 @@ export default function Navigation() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Calendar className="h-8 w-8 text-blue-600" />
-              <h1 className="text-xl font-bold text-slate-900">Room Scheduler</h1>
+              <h1 className="text-xl font-bold text-slate-900">AI-Driven Automated Scheduling System</h1>
             </div>
           </div>
           
