@@ -12,6 +12,10 @@ import Signup from "@/pages/signup";
 import NotFound from "@/pages/not-found";
 import AdminPanel from "@/pages/admin-panel";
 import GenerateSchedule from "@/pages/generate-schedule";
+import FacultyPage from "@/pages/faculty";
+import SubjectsPage from "@/pages/subjects";
+import BreaksPage from "@/pages/breaks";
+import CollegeTimePage from "@/pages/college-time";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -45,11 +49,15 @@ function Router() {
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/dashboard" component={Dashboard} />
+        <Route path="/faculty" component={FacultyPage} />
+        <Route path="/subjects" component={SubjectsPage} />
+        <Route path="/breaks" component={BreaksPage} />
         <Route path="/schedule" component={Dashboard} />
         {user?.role === 'admin' && (
           <>
             <Route path="/admin" component={AdminPanel} />
             <Route path="/generate" component={GenerateSchedule} />
+            <Route path="/college-time" component={CollegeTimePage} />
           </>
         )}
         <Route component={NotFound} />

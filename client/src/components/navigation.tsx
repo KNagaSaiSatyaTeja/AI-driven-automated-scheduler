@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Calendar, Users, Building, BarChart3, Upload, LogOut, Settings, Eye } from "lucide-react";
+import { Calendar, Users, Building, BarChart3, Upload, LogOut, Settings, Eye, BookOpen, Coffee, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,11 +14,16 @@ export default function Navigation() {
   const navItems = isAdmin 
     ? [
         { path: "/", label: "Dashboard", icon: Calendar },
-        { path: "/admin", label: "Admin Panel", icon: Settings },
+        { path: "/faculty", label: "Faculty", icon: Users },
+        { path: "/subjects", label: "Subjects", icon: BookOpen },
+        { path: "/breaks", label: "Breaks", icon: Coffee },
+        { path: "/college-time", label: "College Time", icon: Clock },
         { path: "/generate", label: "Generate Schedule", icon: Upload },
       ]
     : [
         { path: "/", label: "Dashboard", icon: Eye },
+        { path: "/faculty", label: "Faculty", icon: Users },
+        { path: "/subjects", label: "Subjects", icon: BookOpen },
         { path: "/schedule", label: "View Schedule", icon: Calendar },
       ];
 
