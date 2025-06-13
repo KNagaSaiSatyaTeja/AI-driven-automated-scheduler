@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 
 // User interface
 interface IUser extends mongoose.Document {
+  _id: mongoose.Types.ObjectId;
   username: string;
   email: string;
   password: string;

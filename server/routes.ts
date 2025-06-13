@@ -25,7 +25,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = new User({ username, email, password, role: role || 'user' });
       await user.save();
 
-      const token = generateToken((user._id as any).toString(), user.role);
+      const token = generateToken(user._id.toString(), user.role);
       
       res.status(201).json({
         message: "User created successfully",
@@ -238,16 +238,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const faculty = await storage.getAllFaculty();
       
       if (!schedule) {
-        return res.json({
-          totalRooms: 0,
-          activeFaculty: 0,
-          weeklyClasses: 0,
-          avgUtilization: 0
+        return res.status(404).json({ 
+          message: "No schedule data found. Please upload schedule data first." 
         });
       }
 
-      const scheduleData = schedule.subjects as any;
-      const subjects = scheduleData.subjects || [];
+      const subjects = schedule.subjects;
       
       // Calculate weekly classes
       const weeklyClasses = subjects.reduce((total: number, subject: any) => {

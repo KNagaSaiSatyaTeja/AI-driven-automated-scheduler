@@ -187,9 +187,12 @@ export class MongoStorage implements IStorage {
   }
 
   private generateRoomSchedule(roomId: string, scheduleData: any): RoomSchedule {
-    const subjects = scheduleData.subjects || [];
-    const collegeTime = scheduleData.college_time || { startTime: '09:30', endTime: '16:30' };
-    const breakPeriods = scheduleData.break_ || [];
+    if (!scheduleData.subjects || !scheduleData.college_time || !scheduleData.break_periods) {
+      throw new Error('Invalid schedule data: missing required fields');
+    }
+    const subjects = scheduleData.subjects;
+    const collegeTime = scheduleData.college_time;
+    const breakPeriods = scheduleData.break_periods;
 
     const schedule: any = {
       MONDAY: [],
@@ -246,9 +249,12 @@ export class MongoStorage implements IStorage {
   }
 
   private generateFacultySchedule(facultyId: string, facultyName: string, scheduleData: any): FacultySchedule {
-    const subjects = scheduleData.subjects || [];
-    const collegeTime = scheduleData.college_time || { startTime: '09:30', endTime: '16:30' };
-    const breakPeriods = scheduleData.break_ || [];
+    if (!scheduleData.subjects || !scheduleData.college_time || !scheduleData.break_periods) {
+      throw new Error('Invalid schedule data: missing required fields');
+    }
+    const subjects = scheduleData.subjects;
+    const collegeTime = scheduleData.college_time;
+    const breakPeriods = scheduleData.break_periods;
 
     const schedule: any = {
       MONDAY: [],
