@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/room-scheduler';
+let mongoServer: MongoMemoryServer | null = null;
 
 export async function connectToDatabase() {
   try {
@@ -8,8 +9,26 @@ export async function connectToDatabase() {
       return mongoose.connection;
     }
 
-    await mongoose.connect(MONGODB_URI);
-    console.log('Connected to MongoDB');
+    // Use MongoDB Memory Server for development
+    if (process.env.NODE_ENV === 'development') {
+      if (!mongoServer) {
+        mongoServer = await MongoMemoryServer.create({
+          instance: {
+            port: 27017,
+            dbName: 'room-scheduler'
+          }
+        });
+      }
+      const uri = mongoServer.getUri();
+      await mongoose.connect(uri);
+      console.log('Connected to MongoDB Memory Server');
+    } else {
+      // Use actual MongoDB URI in production
+      const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/room-scheduler';
+      await mongoose.connect(MONGODB_URI);
+      console.log('Connected to MongoDB');
+    }
+
     return mongoose.connection;
   } catch (error) {
     console.error('MongoDB connection error:', error);
