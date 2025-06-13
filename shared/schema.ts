@@ -41,7 +41,7 @@ export const facultySchema = z.object({
 
 export const insertFacultySchema = facultySchema.omit({ _id: true, createdAt: true });
 export type InsertFaculty = z.infer<typeof insertFacultySchema>;
-export type Faculty = z.infer<typeof facultySchema>;
+export type FacultyRecord = z.infer<typeof facultySchema>;
 
 // Subject schema
 export const subjectSchema = z.object({
@@ -55,7 +55,7 @@ export const subjectSchema = z.object({
 
 export const insertSubjectSchema = subjectSchema.omit({ _id: true, createdAt: true });
 export type InsertSubject = z.infer<typeof insertSubjectSchema>;
-export type Subject = z.infer<typeof subjectSchema>;
+export type SubjectRecord = z.infer<typeof subjectSchema>;
 
 // Room schema
 export const roomSchema = z.object({
@@ -93,7 +93,7 @@ export const collegeTimeSchema = z.object({
 
 export const insertCollegeTimeSchema = collegeTimeSchema.omit({ _id: true, createdAt: true });
 export type InsertCollegeTime = z.infer<typeof insertCollegeTimeSchema>;
-export type CollegeTime = z.infer<typeof collegeTimeSchema>;
+export type CollegeTimeRecord = z.infer<typeof collegeTimeSchema>;
 
 // MongoDB Schedule Definitions
 export const scheduleSchema = z.object({
@@ -170,6 +170,18 @@ export interface ScheduleAPIRequest {
   break_: APIBreakPeriod[];
   rooms: string[];
   subjects: APISubject[];
+}
+
+// Generated schedule response from API
+export interface GeneratedSchedule {
+  [day: string]: Array<{
+    startTime: string;
+    endTime: string;
+    subject?: string;
+    faculty?: string;
+    room?: string;
+    isBreak?: boolean;
+  }>;
 }
 
 export interface TimeSlot {
