@@ -25,7 +25,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = new User({ username, email, password, role: role || 'user' });
       await user.save();
 
-      const token = generateToken(user._id.toString(), user.role);
+      const token = generateToken((user._id as any).toString(), user.role);
       
       res.status(201).json({
         message: "User created successfully",
