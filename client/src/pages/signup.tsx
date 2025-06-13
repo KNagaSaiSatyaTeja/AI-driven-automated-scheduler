@@ -48,9 +48,6 @@ export default function Signup() {
           ...data,
           role: 'user' // Only allow user signup, not admin
         }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
     },
     onSuccess: (data) => {
