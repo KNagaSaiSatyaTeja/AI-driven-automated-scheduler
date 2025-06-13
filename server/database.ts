@@ -1,57 +1,96 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-let mongoServer: MongoMemoryServer | null = null;
-let isConnected = false;
+class DatabaseManager {
+  private static instance: DatabaseManager;
+  private mongoServer: MongoMemoryServer | null = null;
+  private isConnected = false;
+  private connecting = false;
 
-export async function connectToDatabase() {
-  try {
-    // Check if already connected
-    if (isConnected && mongoose.connection.readyState === 1) {
+  private constructor() {}
+
+  static getInstance(): DatabaseManager {
+    if (!DatabaseManager.instance) {
+      DatabaseManager.instance = new DatabaseManager();
+    }
+    return DatabaseManager.instance;
+  }
+
+  async connect() {
+    if (this.connecting) {
+      // Wait for ongoing connection
+      while (this.connecting) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
       return mongoose.connection;
     }
 
-    // Close existing connection if any
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.connection.close();
+    if (this.isConnected && mongoose.connection.readyState === 1) {
+      return mongoose.connection;
     }
 
-    // Use MongoDB Memory Server for development
-    if (process.env.NODE_ENV === 'development') {
-      if (!mongoServer) {
-        mongoServer = await MongoMemoryServer.create({
-          instance: {
-            port: 27017,
-            dbName: 'room-scheduler'
-          }
-        });
+    this.connecting = true;
+
+    try {
+      // Close existing connection if any
+      if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect();
+        this.isConnected = false;
       }
-      const uri = mongoServer.getUri();
-      await mongoose.connect(uri);
-      console.log('Connected to MongoDB Memory Server');
-    } else {
-      // Use actual MongoDB URI in production
-      const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/room-scheduler';
-      await mongoose.connect(MONGODB_URI);
-      console.log('Connected to MongoDB');
-    }
 
-    isConnected = true;
-    return mongoose.connection;
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    throw error;
+      // Use MongoDB Memory Server for development
+      if (process.env.NODE_ENV === 'development') {
+        if (!this.mongoServer) {
+          this.mongoServer = await MongoMemoryServer.create({
+            instance: {
+              dbName: 'room-scheduler'
+            }
+          });
+        }
+        const uri = this.mongoServer.getUri();
+        await mongoose.connect(uri);
+        console.log('Connected to MongoDB Memory Server');
+      } else {
+        // Use actual MongoDB URI in production
+        const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/room-scheduler';
+        await mongoose.connect(MONGODB_URI);
+        console.log('Connected to MongoDB');
+      }
+
+      this.isConnected = true;
+      return mongoose.connection;
+    } catch (error) {
+      console.error('MongoDB connection error:', error);
+      throw error;
+    } finally {
+      this.connecting = false;
+    }
+  }
+
+  async disconnect() {
+    try {
+      if (this.mongoServer) {
+        await this.mongoServer.stop();
+        this.mongoServer = null;
+      }
+      await mongoose.disconnect();
+      this.isConnected = false;
+      console.log('Disconnected from MongoDB');
+    } catch (error) {
+      console.error('MongoDB disconnection error:', error);
+      throw error;
+    }
   }
 }
 
+export async function connectToDatabase() {
+  const dbManager = DatabaseManager.getInstance();
+  return await dbManager.connect();
+}
+
 export async function disconnectFromDatabase() {
-  try {
-    await mongoose.disconnect();
-    console.log('Disconnected from MongoDB');
-  } catch (error) {
-    console.error('MongoDB disconnection error:', error);
-    throw error;
-  }
+  const dbManager = DatabaseManager.getInstance();
+  return await dbManager.disconnect();
 }
 
 // Schedule Schema

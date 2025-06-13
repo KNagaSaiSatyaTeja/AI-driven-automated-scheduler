@@ -1,0 +1,136 @@
+Build a black-and-white themed web application with colorful icons and two separate dashboards (Admin and User). Use only the existing MongoDB database for all data. No static or hardcoded data is allowed; all data must be dynamically created and handled through forms and stored via API requests using JSON bodies.
+
+🎯 Features
+🎨 UI Design
+Black & White theme for all layouts, components, and backgrounds.
+
+Colorful icons only to visually guide users.
+
+👥 User Roles
+Admin Dashboard:
+
+Full permissions to Create, Edit, and Delete:
+
+Faculty (with time availability)
+
+Subjects (linked to faculty)
+
+Breaks
+
+College time
+
+Rooms
+
+Schedules
+
+User Dashboard:
+
+View-only access to the generated schedule.
+
+📋 Data Management via Forms
+1. College Time Form
+Fields: startTime, endTime
+
+Stored in JSON like:
+
+json
+Copy
+Edit
+{
+  "startTime": "09:30",
+  "endTime": "16:30"
+}
+2. Breaks Form
+Fields: day, startTime, endTime
+
+Example:
+
+json
+Copy
+Edit
+[
+  {
+    "day": "ALL_DAYS",
+    "startTime": "13:00",
+    "endTime": "14:00"
+  }
+]
+3. Faculty Form
+Fields: id, name, and availability (days and time ranges)
+
+json
+Copy
+Edit
+{
+  "id": "F1",
+  "name": "Dr. Anil Sharma",
+  "availability": [
+    {
+      "day": "MONDAY",
+      "startTime": "09:30",
+      "endTime": "13:00"
+    }
+  ]
+}
+4. Subjects Form
+Fields: name, duration, time, no_of_classes_per_week
+
+Faculty must be assigned from existing faculty entries
+
+json
+Copy
+Edit
+{
+  "name": "Discrete Mathematics",
+  "duration": 50,
+  "time": 50,
+  "no_of_classes_per_week": 4,
+  "faculty": [
+    {
+      "id": "F1",
+      "name": "Dr. Anil Sharma",
+      "availability": [...]
+    }
+  ]
+}
+5. Rooms Form
+Simple room name entry (e.g., "R1")
+
+⚙️ Scheduler
+Workflow:
+Select a room.
+
+Add/assign subjects.
+
+Assign existing faculty.
+
+Define breaks.
+
+Set college timing.
+
+Click "Generate Schedule".
+
+Scheduler API:
+Make a POST request to:
+
+arduino
+Copy
+Edit
+http://127.0.0.1:8000/api/generate-schedule
+The payload must match this JSON schema:
+
+json
+Copy
+Edit
+{
+  "college_time": { ... },
+  "break_": [ ... ],
+  "rooms": [ ... ],
+  "subjects": [ ... ]
+}
+📊 Output
+The response from the API must be:
+
+Displayed as a timetable/grid (day vs time, subject, and faculty).
+
+Downloadable as a CSV file.

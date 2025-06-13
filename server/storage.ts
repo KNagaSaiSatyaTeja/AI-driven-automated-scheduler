@@ -171,8 +171,13 @@ export class MongoStorage implements IStorage {
 
   private async initializeConnection() {
     if (!this.initialized) {
-      await connectToDatabase();
-      this.initialized = true;
+      try {
+        await connectToDatabase();
+        this.initialized = true;
+      } catch (error) {
+        console.error('Storage initialization error:', error);
+        // Don't throw to prevent startup failures
+      }
     }
   }
 
