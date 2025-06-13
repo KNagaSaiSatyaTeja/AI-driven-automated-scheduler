@@ -1,0 +1,137 @@
+I want to modify my existing full-stack Room Scheduler System built using Next.js (App Router), Tailwind CSS, shadcn/ui, and MongoDB. The base project is already set up, but needs several enhancements to support complete scheduling functionality with role-based features and an improved UI/UX.
+
+✅ Functional Requirements (Additions & Enhancements)
+1. Authentication & Role-Based Access (JWT)
+Secure login, signup, and logout with JWT-based authentication.
+
+Support for two user roles:
+
+Admin: Full access to manage everything.
+
+User: View-only access to schedules.
+
+🧑‍💼 Admin Dashboard Enhancements
+Room Overview
+Show all available rooms in a clean grid view.
+
+On selecting a room, display:
+
+Subjects and assigned faculty
+
+Breaks
+
+Generated schedule (interactive timetable)
+
+CRUD Operations (with Modal Forms)
+Implement modal-based forms using shadcn/ui for all the following:
+
+Faculty Management
+
+Add/Edit faculty with:
+
+Name
+
+Availability (day-wise time slots — support for constraints)
+
+Constraints like unavailable days/times
+
+Subject Management
+
+Add/Edit subjects with:
+
+Name
+
+Code
+
+Faculty dropdown (to assign one of the added faculty members)
+
+Break Management
+
+Add/Edit breaks for specific time ranges
+
+Breaks should appear clearly in the generated schedule
+
+Room Management
+
+Add/Edit/Delete rooms
+
+Assign subjects and faculty to each room
+
+Generate Schedule Button
+Include a button to call the FastAPI scheduler at:
+
+arduino
+Copy
+Edit
+http://127.0.0.1:8000/API/generate-schedule
+Send a well-structured JSON payload including:
+
+College timings (e.g., Mon–Sat, 09:30–16:30)
+
+Breaks
+
+Room list
+
+Subject-faculty mappings
+
+Faculty availability and constraints
+
+Save the API response to MongoDB.
+
+Display the updated schedule in a dynamic timetable format.
+
+👤 User Dashboard
+View-only access to:
+
+Timetables organized by room or faculty
+
+Display in a calendar-like layout with:
+
+Time slots, days, and breaks clearly marked
+
+Color-coded subjects
+
+Breaks (like lunch from 13:00–14:00) distinctly shown
+
+💡 UI/UX and Design
+Use Tailwind CSS and shadcn/ui to build a clean, modern, responsive interface.
+
+Modals for all data entry actions.
+
+Use toast notifications and validations for a professional experience.
+
+Ensure dark/light mode support.
+
+🧾 About Page (New)
+Add an About section/page describing:
+
+Purpose of the scheduler system
+
+How admins and users interact with it
+
+Technologies used (Next.js, MongoDB, FastAPI, Tailwind, shadcn/ui)
+
+Example use case: Smart class timetable scheduling for a college
+
+🗂 Technical Best Practices
+Modular code and clean folder structure:
+
+components/, lib/, app/, services/, models/, middleware/
+
+Secure API routes using middleware-based JWT guards
+
+Use environment variables for Mongo URI, JWT secret, and API endpoints
+
+Reusable UI components with shadcn/ui
+
+Async state handling and form validation
+
+Let me know if you'd like:
+
+A tailored folder structure
+
+Sample modal code for Faculty/Subject/Breaks
+
+JSON format for schedule generation
+
+Middleware and JWT helper examples

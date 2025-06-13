@@ -24,14 +24,16 @@ export class MongoStorage implements IStorage {
   async getSchedule(): Promise<Schedule | undefined> {
     await connectToDatabase();
     const schedule = await ScheduleModel.findOne().sort({ created_at: -1 }).lean();
-    if (!schedule) return undefined;
+    if (!schedule || !schedule.college_time || !schedule.break_periods || !schedule.rooms || !schedule.subjects) {
+      return undefined;
+    }
     
     return {
       _id: schedule._id.toString(),
-      college_time: schedule.college_time || { startTime: '09:30', endTime: '16:30' },
-      break_periods: schedule.break_periods || [],
-      rooms: schedule.rooms || [],
-      subjects: schedule.subjects || [],
+      college_time: schedule.college_time as { startTime: string; endTime: string; },
+      break_periods: schedule.break_periods as any[],
+      rooms: schedule.rooms as string[],
+      subjects: schedule.subjects as any[],
       created_at: schedule.created_at?.toISOString(),
     };
   }
@@ -51,10 +53,10 @@ export class MongoStorage implements IStorage {
     
     return {
       _id: savedSchedule._id.toString(),
-      college_time: savedSchedule.college_time || { startTime: '09:30', endTime: '16:30' },
-      break_periods: savedSchedule.break_periods || [],
-      rooms: savedSchedule.rooms || [],
-      subjects: savedSchedule.subjects || [],
+      college_time: savedSchedule.college_time!,
+      break_periods: savedSchedule.break_periods!,
+      rooms: savedSchedule.rooms!,
+      subjects: savedSchedule.subjects!,
       created_at: savedSchedule.created_at?.toISOString(),
     };
   }
@@ -79,10 +81,10 @@ export class MongoStorage implements IStorage {
     
     return {
       _id: updatedSchedule._id.toString(),
-      college_time: updatedSchedule.college_time || { startTime: '09:30', endTime: '16:30' },
-      break_periods: updatedSchedule.break_periods || [],
-      rooms: updatedSchedule.rooms || [],
-      subjects: updatedSchedule.subjects || [],
+      college_time: updatedSchedule.college_time!,
+      break_periods: updatedSchedule.break_periods!,
+      rooms: updatedSchedule.rooms!,
+      subjects: updatedSchedule.subjects!,
       created_at: updatedSchedule.created_at?.toISOString(),
     };
   }
