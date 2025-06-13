@@ -179,12 +179,12 @@ export class MongoStorage implements IStorage {
     if (!user) return undefined;
     
     return {
-      _id: user._id.toString(),
-      username: user.username,
-      email: user.email,
-      password: user.password,
-      role: user.role as 'admin' | 'user',
-      createdAt: user.createdAt
+      _id: (user as any)._id.toString(),
+      username: (user as any).username,
+      email: (user as any).email,
+      password: (user as any).password,
+      role: (user as any).role as 'admin' | 'user',
+      createdAt: (user as any).createdAt
     };
   }
 
@@ -194,12 +194,12 @@ export class MongoStorage implements IStorage {
     if (!user) return undefined;
     
     return {
-      _id: user._id.toString(),
-      username: user.username,
-      email: user.email,
-      password: user.password,
-      role: user.role as 'admin' | 'user',
-      createdAt: user.createdAt
+      _id: (user as any)._id.toString(),
+      username: (user as any).username,
+      email: (user as any).email,
+      password: (user as any).password,
+      role: (user as any).role as 'admin' | 'user',
+      createdAt: (user as any).createdAt
     };
   }
 
