@@ -170,12 +170,17 @@ export class MongoStorage implements IStorage {
   }
 
   private async initializeConnection() {
-    await connectToDatabase();
+    if (!this.initialized) {
+      await connectToDatabase();
+      this.initialized = true;
+    }
   }
+
+  private initialized = false;
 
   // Authentication methods
   async getUserByUsername(username: string): Promise<User | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const user = await UserModel.findOne({ username }).lean();
     if (!user) return undefined;
     
@@ -190,7 +195,7 @@ export class MongoStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    await connectToDatabase();
+    await this.initializeConnection();
     const user = await UserModel.findOne({ email }).lean();
     if (!user) return undefined;
     
