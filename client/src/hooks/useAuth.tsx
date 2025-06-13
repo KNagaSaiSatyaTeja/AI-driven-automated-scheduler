@@ -30,6 +30,15 @@ export function useAuth() {
     queryKey: ['/api/auth/me'],
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    queryFn: async () => {
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include' // Include cookies for session
+      });
+      if (!response.ok) {
+        return null; // Return null instead of throwing for unauthenticated users
+      }
+      return response.json();
+    }
   });
 
   // Login mutation
@@ -38,6 +47,7 @@ export function useAuth() {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(data),
       });
       
@@ -60,6 +70,7 @@ export function useAuth() {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(data),
       });
       
@@ -81,6 +92,7 @@ export function useAuth() {
     mutationFn: async () => {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
+        credentials: 'include',
       });
       
       if (!response.ok) {
@@ -95,7 +107,7 @@ export function useAuth() {
 
   return {
     user,
-    isAuthenticated: !!user && !error,
+    isAuthenticated: !!user,
     isLoading,
     login: loginMutation.mutate,
     signup: signupMutation.mutate,
