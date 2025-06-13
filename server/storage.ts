@@ -227,11 +227,11 @@ export class MongoStorage implements IStorage {
   async getAllFaculty(): Promise<FacultyRecord[]> {
     await connectToDatabase();
     const faculty = await FacultyModel.find().lean();
-    return faculty.map(f => ({
+    return faculty.map((f: any) => ({
       _id: f._id.toString(),
       id: f.id,
       name: f.name,
-      availability: f.availability.map(a => ({
+      availability: f.availability.map((a: any) => ({
         day: a.day || '',
         startTime: a.startTime || '',
         endTime: a.endTime || ''
@@ -248,7 +248,7 @@ export class MongoStorage implements IStorage {
       _id: saved._id.toString(),
       id: saved.id,
       name: saved.name,
-      availability: saved.availability.map(a => ({
+      availability: saved.availability.map((a: any) => ({
         day: a.day || '',
         startTime: a.startTime || '',
         endTime: a.endTime || ''
@@ -262,16 +262,17 @@ export class MongoStorage implements IStorage {
     const updated = await FacultyModel.findOneAndUpdate({ id }, faculty, { new: true }).lean();
     if (!updated) return undefined;
     
+    const updatedDoc = updated as any;
     return {
-      _id: updated._id.toString(),
-      id: updated.id,
-      name: updated.name,
-      availability: updated.availability.map(a => ({
+      _id: updatedDoc._id.toString(),
+      id: updatedDoc.id,
+      name: updatedDoc.name,
+      availability: updatedDoc.availability.map((a: any) => ({
         day: a.day || '',
         startTime: a.startTime || '',
         endTime: a.endTime || ''
       })),
-      createdAt: updated.createdAt
+      createdAt: updatedDoc.createdAt
     };
   }
 
@@ -285,7 +286,7 @@ export class MongoStorage implements IStorage {
   async getAllSubjects(): Promise<SubjectRecord[]> {
     await connectToDatabase();
     const subjects = await SubjectModel.find().lean();
-    return subjects.map(s => ({
+    return subjects.map((s: any) => ({
       _id: s._id.toString(),
       name: s.name,
       duration: s.duration,

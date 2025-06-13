@@ -5,8 +5,14 @@ let mongoServer: MongoMemoryServer | null = null;
 
 export async function connectToDatabase() {
   try {
-    if (mongoose.connection.readyState >= 1) {
+    // Check if already connected
+    if (mongoose.connection.readyState === 1) {
       return mongoose.connection;
+    }
+
+    // Disconnect any existing connection first
+    if (mongoose.connection.readyState > 0) {
+      await mongoose.disconnect();
     }
 
     // Use MongoDB Memory Server for development
