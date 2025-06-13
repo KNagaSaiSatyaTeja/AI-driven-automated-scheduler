@@ -16,6 +16,7 @@ export const scheduleSchema = z.object({
   subjects: z.array(z.object({
     name: z.string(),
     duration: z.number(),
+    time: z.number().optional(), // Additional time field
     no_of_classes_per_week: z.number(),
     faculty: z.array(z.object({
       id: z.string(),

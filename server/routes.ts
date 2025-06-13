@@ -2,9 +2,124 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertScheduleSchema } from "@shared/schema";
+import { authenticate, requireAdmin, User, generateToken } from "./auth";
+import { AIScheduler } from "./scheduler";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  const aiScheduler = new AIScheduler();
+
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, email, password, role } = req.body;
+      
+      const existingUser = await User.findOne({ 
+        $or: [{ email }, { username }] 
+      });
+      
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      const user = new User({ username, email, password, role: role || 'user' });
+      await user.save();
+
+      const token = generateToken(user._id.toString(), user.role);
+      
+      res.status(201).json({
+        message: "User created successfully",
+        token,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      const user = await User.findOne({ email });
+      if (!user || !(await user.comparePassword(password))) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      const token = generateToken(user._id.toString(), user.role);
+      
+      res.json({
+        message: "Login successful",
+        token,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // AI Schedule Generation API
+  app.post("/api/generate-scheduler", authenticate, requireAdmin, async (req, res) => {
+    try {
+      const scheduleData = req.body;
+      
+      // Validate the schedule data structure
+      const validation = insertScheduleSchema.safeParse({
+        college_time: scheduleData.college_time,
+        break_periods: scheduleData.break_,
+        rooms: scheduleData.rooms,
+        subjects: scheduleData.subjects
+      });
+
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid schedule data format",
+          errors: validation.error.errors 
+        });
+      }
+
+      // Generate optimal schedule using AI
+      const result = aiScheduler.generateOptimalSchedule(scheduleData);
+      
+      if (!result.success) {
+        return res.status(400).json({
+          message: result.message,
+          success: false
+        });
+      }
+
+      // Save the generated schedule to database
+      const savedSchedule = await storage.createSchedule(validation.data);
+      
+      // Calculate metrics for the generated schedule
+      const metrics = aiScheduler.calculateScheduleMetrics(result.schedule);
+
+      res.json({
+        message: result.message,
+        success: true,
+        schedule: result.schedule,
+        conflicts: result.conflicts,
+        metrics: metrics,
+        savedSchedule: savedSchedule
+      });
+    } catch (error) {
+      console.error("Error generating schedule:", error);
+      res.status(500).json({ message: "Failed to generate schedule" });
+    }
+  });
+
   // GET /api/scheduler - Get current schedule data
   app.get("/api/scheduler", async (req, res) => {
     try {
