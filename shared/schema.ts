@@ -1,6 +1,101 @@
 import { z } from "zod";
 
-// MongoDB Schema Definitions
+// User schema for authentication
+export const userSchema = z.object({
+  _id: z.string().optional(),
+  username: z.string(),
+  email: z.string().email(),
+  password: z.string(), // Will be hashed
+  role: z.enum(['admin', 'user']).default('user'),
+  createdAt: z.date().optional(),
+});
+
+export const insertUserSchema = userSchema.omit({ _id: true, createdAt: true });
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = z.infer<typeof userSchema>;
+
+// Login schema
+export const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const signupSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+// Faculty schema
+export const facultySchema = z.object({
+  _id: z.string().optional(),
+  id: z.string(),
+  name: z.string(),
+  availability: z.array(z.object({
+    day: z.string(),
+    startTime: z.string(),
+    endTime: z.string(),
+  })),
+  createdAt: z.date().optional(),
+});
+
+export const insertFacultySchema = facultySchema.omit({ _id: true, createdAt: true });
+export type InsertFaculty = z.infer<typeof insertFacultySchema>;
+export type Faculty = z.infer<typeof facultySchema>;
+
+// Subject schema
+export const subjectSchema = z.object({
+  _id: z.string().optional(),
+  name: z.string(),
+  duration: z.number(),
+  no_of_classes_per_week: z.number(),
+  facultyId: z.string(),
+  createdAt: z.date().optional(),
+});
+
+export const insertSubjectSchema = subjectSchema.omit({ _id: true, createdAt: true });
+export type InsertSubject = z.infer<typeof insertSubjectSchema>;
+export type Subject = z.infer<typeof subjectSchema>;
+
+// Room schema
+export const roomSchema = z.object({
+  _id: z.string().optional(),
+  id: z.string(),
+  name: z.string(),
+  capacity: z.number().optional(),
+  createdAt: z.date().optional(),
+});
+
+export const insertRoomSchema = roomSchema.omit({ _id: true, createdAt: true });
+export type InsertRoom = z.infer<typeof insertRoomSchema>;
+export type Room = z.infer<typeof roomSchema>;
+
+// Break schema
+export const breakSchema = z.object({
+  _id: z.string().optional(),
+  day: z.string(),
+  startTime: z.string(),
+  endTime: z.string(),
+  createdAt: z.date().optional(),
+});
+
+export const insertBreakSchema = breakSchema.omit({ _id: true, createdAt: true });
+export type InsertBreak = z.infer<typeof insertBreakSchema>;
+export type Break = z.infer<typeof breakSchema>;
+
+// College time schema
+export const collegeTimeSchema = z.object({
+  _id: z.string().optional(),
+  startTime: z.string(),
+  endTime: z.string(),
+  createdAt: z.date().optional(),
+});
+
+export const insertCollegeTimeSchema = collegeTimeSchema.omit({ _id: true, createdAt: true });
+export type InsertCollegeTime = z.infer<typeof insertCollegeTimeSchema>;
+export type CollegeTime = z.infer<typeof collegeTimeSchema>;
+
+// MongoDB Schedule Definitions
 export const scheduleSchema = z.object({
   _id: z.string().optional(),
   college_time: z.object({
@@ -39,42 +134,42 @@ export const insertScheduleSchema = scheduleSchema.omit({
 export type InsertSchedule = z.infer<typeof insertScheduleSchema>;
 export type Schedule = z.infer<typeof scheduleSchema>;
 
-// Detailed type definitions for the JSON structure
-export interface CollegeTime {
+// API data structure interfaces for external scheduler API
+export interface APICollegeTime {
   startTime: string;
   endTime: string;
 }
 
-export interface BreakPeriod {
+export interface APIBreakPeriod {
   day: string;
   startTime: string;
   endTime: string;
 }
 
-export interface FacultyAvailability {
+export interface APIFacultyAvailability {
   day: string;
   startTime: string;
   endTime: string;
 }
 
-export interface Faculty {
+export interface APIFaculty {
   id: string;
   name: string;
-  availability: FacultyAvailability[];
+  availability: APIFacultyAvailability[];
 }
 
-export interface Subject {
+export interface APISubject {
   name: string;
   duration: number;
   no_of_classes_per_week: number;
-  faculty: Faculty[];
+  faculty: APIFaculty[];
 }
 
-export interface ScheduleData {
-  college_time: CollegeTime;
-  break_: BreakPeriod[];
+export interface ScheduleAPIRequest {
+  college_time: APICollegeTime;
+  break_: APIBreakPeriod[];
   rooms: string[];
-  subjects: Subject[];
+  subjects: APISubject[];
 }
 
 export interface TimeSlot {
