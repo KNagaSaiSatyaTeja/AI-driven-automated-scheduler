@@ -155,7 +155,7 @@ export default function GenerateSchedule() {
             ?.map(facultyId => {
               const facultyMember = faculty.find(f => f._id === facultyId);
               return facultyMember ? {
-                id: facultyMember._id,
+                id: facultyMember.id || facultyMember._id,
                 name: facultyMember.name,
                 availability: facultyMember.availability
               } : null;

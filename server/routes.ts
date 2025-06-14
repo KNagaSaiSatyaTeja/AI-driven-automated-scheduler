@@ -394,7 +394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const scheduleRequest: ScheduleAPIRequest = req.body;
       
       // Call external scheduler API
-      const response = await fetch('http://127.0.0.1:8000/api/generate-schedule', {
+      const response = await fetch('http://127.0.0.1:8000/generate-scheduler', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

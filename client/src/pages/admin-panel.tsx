@@ -74,6 +74,7 @@ export default function AdminPanel() {
   
   // Faculty state
   const [facultyForm, setFacultyForm] = useState({
+    id: '',
     name: '',
     email: '',
     department: '',
@@ -122,7 +123,7 @@ export default function AdminPanel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/faculty'] });
       toast({ title: 'Faculty created successfully' });
-      setFacultyForm({ name: '', email: '', department: '', availability: [{ day: 'MONDAY', startTime: '09:00', endTime: '17:00' }] });
+      setFacultyForm({ id: '', name: '', email: '', department: '', availability: [{ day: 'MONDAY', startTime: '09:00', endTime: '17:00' }] });
     }
   });
 
@@ -158,7 +159,7 @@ export default function AdminPanel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/rooms'] });
       toast({ title: 'Room created successfully' });
-      setRoomForm({ name: '', capacity: 30, type: 'Classroom' });
+      setRoomForm({ id: '', name: '', capacity: 30, type: 'Classroom' });
     }
   });
 
@@ -287,6 +288,15 @@ export default function AdminPanel() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div>
+                    <Label className="text-black dark:text-white">Faculty ID</Label>
+                    <Input
+                      value={facultyForm.id}
+                      onChange={(e) => setFacultyForm(prev => ({ ...prev, id: e.target.value }))}
+                      className="bg-white dark:bg-black border-gray-300 dark:border-gray-700 text-black dark:text-white"
+                      placeholder="e.g., F1, F2, etc."
+                    />
+                  </div>
                   <div>
                     <Label className="text-black dark:text-white">Name</Label>
                     <Input
@@ -525,6 +535,15 @@ export default function AdminPanel() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div>
+                    <Label className="text-black dark:text-white">Room ID</Label>
+                    <Input
+                      value={roomForm.id}
+                      onChange={(e) => setRoomForm(prev => ({ ...prev, id: e.target.value }))}
+                      className="bg-white dark:bg-black border-gray-300 dark:border-gray-700 text-black dark:text-white"
+                      placeholder="e.g., R1, R2, etc."
+                    />
+                  </div>
                   <div>
                     <Label className="text-black dark:text-white">Room Name</Label>
                     <Input
