@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import session from 'express-session';
 import { storage } from "./storage";
+import { AIScheduler } from "./scheduler";
 import { 
   loginSchema, 
   signupSchema, 
@@ -391,22 +392,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Schedule generation route
   app.post('/api/generate-schedule', authenticate, requireAdmin, async (req, res) => {
     try {
-      const scheduleRequest: ScheduleAPIRequest = req.body;
+      // Create the JSON payload from MongoDB data
+      const faculty = await storage.getAllFaculty();
+      const subjects = await storage.getAllSubjects();
+      const rooms = await storage.getAllRooms();
+      const breaks = await storage.getAllBreaks();
+      const collegeTime = await storage.getCollegeTime();
+      
+      if (!collegeTime) {
+        return res.status(400).json({ message: 'College time not configured' });
+      }
+      
+      // Format data for external API
+      const apiPayload = {
+        college_time: {
+          startTime: collegeTime.startTime,
+          endTime: collegeTime.endTime
+        },
+        break_: breaks.map(br => ({
+          day: br.day,
+          startTime: br.startTime,
+          endTime: br.endTime
+        })),
+        rooms: rooms.map(room => room.id),
+        subjects: subjects.map(subject => ({
+          name: subject.name,
+          duration: subject.duration,
+          no_of_classes_per_week: subject.no_of_classes_per_week,
+          faculty: faculty
+            .filter(fac => subject.faculty?.includes(fac.id))
+            .map(fac => ({
+              id: fac.id,
+              name: fac.name,
+              availability: fac.availability
+            }))
+        }))
+      };
+      
+      console.log('Sending payload to external API:', JSON.stringify(apiPayload, null, 2));
       
       // Call external scheduler API
-      const response = await fetch('http://127.0.0.1:8000/generate-scheduler', {
+      const response = await fetch('http://127.0.0.1:8000/api/generate-schedule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(scheduleRequest)
+        body: JSON.stringify(apiPayload)
       });
 
       if (!response.ok) {
-        throw new Error(`External API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('External API error response:', errorText);
+        throw new Error(`External API error: ${response.status} ${response.statusText}`);
       }
 
       const generatedSchedule = await response.json();
+      console.log('Received schedule from external API:', generatedSchedule);
       
       // Save the generated schedule
       await storage.saveGeneratedSchedule('latest', generatedSchedule);
@@ -415,7 +456,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Schedule generation error:', error);
       res.status(500).json({ 
-        message: 'Failed to generate schedule. Make sure the external scheduler API is running.' 
+        message: 'Failed to generate schedule. Make sure the external scheduler API is running at http://127.0.0.1:8000',
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
