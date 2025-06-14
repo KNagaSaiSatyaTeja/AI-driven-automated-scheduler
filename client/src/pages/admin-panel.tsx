@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -69,6 +70,7 @@ const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'
 export default function AdminPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   
   // Faculty state
   const [facultyForm, setFacultyForm] = useState({
@@ -228,26 +230,30 @@ export default function AdminPanel() {
         </div>
 
         <Tabs defaultValue="faculty" className="space-y-6">
-          <TabsList className="bg-gray-100 dark:bg-gray-900">
-            <TabsTrigger value="faculty" className="text-black dark:text-white">
+          <TabsList className="bg-gray-100 dark:bg-gray-900 w-full justify-start flex-wrap h-auto p-2 gap-2">
+            <TabsTrigger value="faculty" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
               <Users className="w-4 h-4 mr-2 text-blue-600" />
               Faculty
             </TabsTrigger>
-            <TabsTrigger value="subjects" className="text-black dark:text-white">
+            <TabsTrigger value="subjects" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
               <BookOpen className="w-4 h-4 mr-2 text-green-600" />
               Subjects
             </TabsTrigger>
-            <TabsTrigger value="rooms" className="text-black dark:text-white">
+            <TabsTrigger value="rooms" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
               <Building className="w-4 h-4 mr-2 text-purple-600" />
               Rooms
             </TabsTrigger>
-            <TabsTrigger value="breaks" className="text-black dark:text-white">
+            <TabsTrigger value="breaks" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
               <Coffee className="w-4 h-4 mr-2 text-orange-600" />
               Breaks
             </TabsTrigger>
-            <TabsTrigger value="college-time" className="text-black dark:text-white">
+            <TabsTrigger value="college-time" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
               <Clock className="w-4 h-4 mr-2 text-red-600" />
               College Time
+            </TabsTrigger>
+            <TabsTrigger value="scheduler" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
+              <Calendar className="w-4 h-4 mr-2 text-indigo-600" />
+              Scheduler
             </TabsTrigger>
           </TabsList>
 
@@ -674,6 +680,86 @@ export default function AdminPanel() {
                   <Save className="w-4 h-4 mr-2" />
                   Update College Time
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Scheduler Tab */}
+          <TabsContent value="scheduler">
+            <Card className="border-gray-200 dark:border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-black dark:text-white flex items-center">
+                  <Calendar className="w-5 h-5 mr-2 text-indigo-600" />
+                  Generate Schedule
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Generate an optimized timetable using the configured faculty, subjects, rooms, and breaks
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <Users className="w-5 h-5 text-blue-600 mr-2" />
+                      <h3 className="font-medium text-black dark:text-white">Faculty</h3>
+                    </div>
+                    <p className="text-2xl font-bold text-blue-600">{faculty.length}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Available</p>
+                  </div>
+                  
+                  <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <BookOpen className="w-5 h-5 text-green-600 mr-2" />
+                      <h3 className="font-medium text-black dark:text-white">Subjects</h3>
+                    </div>
+                    <p className="text-2xl font-bold text-green-600">{subjects.length}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Configured</p>
+                  </div>
+                  
+                  <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <Building className="w-5 h-5 text-purple-600 mr-2" />
+                      <h3 className="font-medium text-black dark:text-white">Rooms</h3>
+                    </div>
+                    <p className="text-2xl font-bold text-purple-600">{rooms.length}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Available</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h4 className="font-medium text-black dark:text-white mb-2">Prerequisites</h4>
+                    <ul className="space-y-2 text-sm">
+                      <li className={`flex items-center ${faculty.length > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`w-2 h-2 rounded-full mr-2 ${faculty.length > 0 ? 'bg-green-600' : 'bg-red-600'}`}></div>
+                        At least one faculty member ({faculty.length} configured)
+                      </li>
+                      <li className={`flex items-center ${subjects.length > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`w-2 h-2 rounded-full mr-2 ${subjects.length > 0 ? 'bg-green-600' : 'bg-red-600'}`}></div>
+                        At least one subject ({subjects.length} configured)
+                      </li>
+                      <li className={`flex items-center ${rooms.length > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`w-2 h-2 rounded-full mr-2 ${rooms.length > 0 ? 'bg-green-600' : 'bg-red-600'}`}></div>
+                        At least one room ({rooms.length} configured)
+                      </li>
+                      <li className={`flex items-center ${collegeTime ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`w-2 h-2 rounded-full mr-2 ${collegeTime ? 'bg-green-600' : 'bg-red-600'}`}></div>
+                        College time configured ({collegeTime ? `${collegeTime.startTime} - ${collegeTime.endTime}` : 'Not set'})
+                      </li>
+                    </ul>
+                  </div>
+
+                  <Button
+                    onClick={() => {
+                      setLocation('/generate-schedule');
+                    }}
+                    disabled={faculty.length === 0 || subjects.length === 0 || rooms.length === 0 || !collegeTime}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white disabled:bg-gray-400"
+                  >
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Go to Schedule Generator
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
