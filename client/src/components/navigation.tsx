@@ -55,6 +55,18 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
+            {isAdmin && (
+              <Link href="/admin">
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Admin Panel
+                </Button>
+              </Link>
+            )}
             <span className="text-sm text-muted-foreground">
               {user?.username} ({user?.role})
             </span>

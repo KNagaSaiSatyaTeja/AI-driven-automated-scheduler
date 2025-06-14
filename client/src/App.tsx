@@ -56,6 +56,8 @@ function Router() {
         {user?.role === 'admin' && (
           <>
             <Route path="/admin" component={AdminPanel} />
+            <Route path="/admin-panel" component={AdminPanel} />
+            <Route path="/generate-schedule" component={GenerateSchedule} />
             <Route path="/generate" component={GenerateSchedule} />
             <Route path="/college-time" component={CollegeTimePage} />
           </>
