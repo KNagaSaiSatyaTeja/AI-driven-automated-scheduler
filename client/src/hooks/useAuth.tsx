@@ -37,7 +37,9 @@ export function useAuth() {
       if (!response.ok) {
         return null; // Return null instead of throwing for unauthenticated users
       }
-      return response.json();
+      const userData = await response.json();
+      console.log('User data from API:', userData); // Debug log
+      return userData;
     }
   });
 

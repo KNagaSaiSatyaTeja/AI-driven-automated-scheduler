@@ -42,12 +42,14 @@ function Router() {
     );
   }
 
-  // If authenticated, show main app
+  // If authenticated, show main app with role-based routing
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <Switch>
-        <Route path="/" component={Dashboard} />
+        <Route path="/">
+          {user?.role === 'admin' ? <AdminPanel /> : <Dashboard />}
+        </Route>
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/faculty" component={FacultyPage} />
         <Route path="/subjects" component={SubjectsPage} />

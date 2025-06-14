@@ -153,7 +153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser({
         ...userData,
-        role: 'user'
+        role: userData.role || 'user'
       });
 
       const token = jwt.sign(
