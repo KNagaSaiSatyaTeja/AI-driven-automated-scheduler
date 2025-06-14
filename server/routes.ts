@@ -43,7 +43,7 @@ interface AuthenticatedRequest extends Request {
 
 const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '') || req.session?.token;
+    const token = req.header('Authorization')?.replace('Bearer ', '') || (req.session as any)?.token;
     
     if (!token) {
       return res.status(401).json({ message: 'Access denied. No token provided.' });
@@ -121,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { expiresIn: '24h' }
       );
 
-      req.session!.token = token;
+      (req.session as any).token = token;
       
       res.json({
         token,
@@ -162,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { expiresIn: '24h' }
       );
 
-      req.session!.token = token;
+      (req.session as any).token = token;
 
       res.status(201).json({
         token,

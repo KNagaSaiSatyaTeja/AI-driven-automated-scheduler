@@ -22,6 +22,7 @@ import {
 
 interface Faculty {
   _id: string;
+  id: string;
   name: string;
   email: string;
   department: string;
