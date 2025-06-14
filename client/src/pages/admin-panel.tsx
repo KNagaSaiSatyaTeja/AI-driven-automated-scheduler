@@ -90,6 +90,7 @@ export default function AdminPanel() {
   
   // Room state
   const [roomForm, setRoomForm] = useState({
+    id: '',
     name: '',
     capacity: 30,
     type: 'Classroom'
@@ -444,6 +445,22 @@ export default function AdminPanel() {
                       className="bg-white dark:bg-black border-gray-300 dark:border-gray-700 text-black dark:text-white"
                     />
                   </div>
+                  <div>
+                    <Label className="text-black dark:text-white">Faculty</Label>
+                    <Select 
+                      value={subjectForm.faculty[0] || ""} 
+                      onValueChange={(value) => setSubjectForm(prev => ({ ...prev, faculty: [value] }))}
+                    >
+                      <SelectTrigger className="bg-white dark:bg-black border-gray-300 dark:border-gray-700">
+                        <SelectValue placeholder="Select faculty" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {faculty.map(f => (
+                          <SelectItem key={f._id} value={f._id}>{f.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Button
                     onClick={() => createSubjectMutation.mutate(subjectForm)}
                     disabled={createSubjectMutation.isPending}
@@ -468,6 +485,18 @@ export default function AdminPanel() {
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             {s.duration} min • {s.no_of_classes_per_week} classes/week
                           </p>
+                          {s.faculty && s.faculty.length > 0 && (
+                            <div className="flex gap-1 mt-1">
+                              {s.faculty.map((facultyId) => {
+                                const facultyMember = faculty.find(f => f._id === facultyId);
+                                return facultyMember ? (
+                                  <Badge key={facultyId} variant="outline" className="text-xs">
+                                    {facultyMember.name}
+                                  </Badge>
+                                ) : null;
+                              })}
+                            </div>
+                          )}
                         </div>
                         <Button
                           variant="outline"

@@ -32,6 +32,8 @@ export const facultySchema = z.object({
   _id: z.string().optional(),
   id: z.string(),
   name: z.string(),
+  email: z.string().optional(),
+  department: z.string().optional(),
   availability: z.array(z.object({
     day: z.string(),
     startTime: z.string(),
@@ -50,7 +52,7 @@ export const subjectSchema = z.object({
   name: z.string(),
   duration: z.number(),
   no_of_classes_per_week: z.number(),
-  facultyId: z.string(),
+  faculty: z.array(z.string()), // Array of faculty IDs
   createdAt: z.date().optional(),
 });
 
@@ -64,6 +66,8 @@ export const roomSchema = z.object({
   id: z.string(),
   name: z.string(),
   capacity: z.number().optional(),
+  type: z.string().optional(),
+  subjects: z.array(z.string()).optional(), // Array of subject IDs
   createdAt: z.date().optional(),
 });
 

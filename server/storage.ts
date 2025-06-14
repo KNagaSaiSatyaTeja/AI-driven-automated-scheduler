@@ -35,6 +35,8 @@ const UserSchema = new mongoose.Schema({
 const FacultySchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
+  email: { type: String },
+  department: { type: String },
   availability: [{
     day: String,
     startTime: String,
@@ -47,7 +49,7 @@ const SubjectSchema = new mongoose.Schema({
   name: { type: String, required: true },
   duration: { type: Number, required: true },
   no_of_classes_per_week: { type: Number, required: true },
-  facultyId: { type: String, required: true },
+  faculty: [{ type: String }], // Array of faculty IDs
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -55,6 +57,8 @@ const RoomSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   capacity: { type: Number },
+  type: { type: String },
+  subjects: [{ type: String }], // Array of subject IDs
   createdAt: { type: Date, default: Date.now }
 });
 
