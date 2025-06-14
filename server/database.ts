@@ -37,11 +37,26 @@ class DatabaseManager {
         this.isConnected = false;
       }
 
-      // Use MongoDB URI - default to local MongoDB if not provided
-      const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ai-automated-scheduler';
+      // Use actual MongoDB URI - fallback to memory server if no URI provided
+      const MONGODB_URI = process.env.MONGODB_URI;
       
-      await mongoose.connect(MONGODB_URI);
-      console.log('Connected to MongoDB:', MONGODB_URI.includes('@') ? MONGODB_URI.replace(/\/\/.*@/, '//***:***@') : MONGODB_URI);
+      if (MONGODB_URI) {
+        await mongoose.connect(MONGODB_URI);
+        console.log('Connected to MongoDB:', MONGODB_URI.replace(/\/\/.*@/, '//***:***@'));
+      } else {
+        // Fallback to memory server for development
+        const { MongoMemoryServer } = await import('mongodb-memory-server');
+        if (!this.mongoServer) {
+          this.mongoServer = await MongoMemoryServer.create({
+            instance: {
+              dbName: 'ai-automated-scheduler'
+            }
+          });
+        }
+        const uri = this.mongoServer.getUri();
+        await mongoose.connect(uri);
+        console.log('Connected to MongoDB Memory Server (fallback)');
+      }
 
       this.isConnected = true;
       return mongoose.connection;
