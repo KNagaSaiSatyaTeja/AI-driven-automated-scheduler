@@ -103,6 +103,7 @@ The application uses a unique dual-database approach:
 ## Changelog
 
 - June 14, 2025. Initial setup
+- June 14, 2025. Created new admin credentials and rebranded application from "Room Scheduler" to "AI-Driven Automated Scheduler"
 
 ## User Preferences
 

@@ -70,7 +70,7 @@ function Router() {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="room-scheduler-theme">
+    <ThemeProvider defaultTheme="light" storageKey="ai-scheduler-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />

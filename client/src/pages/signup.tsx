@@ -34,7 +34,7 @@ export default function Signup() {
             Create Account
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-400">
-            Join the Room Scheduler platform
+            Join the AI-Driven Automated Scheduler platform
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -28,10 +28,10 @@ export default function Login() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-black dark:text-white">
-            Room Scheduler
+            AI-Driven Automated Scheduler
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-400">
-            Sign in to manage your schedules
+            Sign in to manage intelligent scheduling
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -86,13 +86,24 @@ export default function Login() {
               )}
             </Button>
           </form>
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
-              <Link href="/signup" className="text-blue-600 dark:text-blue-400 hover:underline">
-                Sign up
-              </Link>
-            </p>
+          <div className="mt-6 space-y-4">
+            <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-md border border-blue-200 dark:border-blue-800">
+              <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                Default Login Credentials
+              </h4>
+              <div className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+                <p><strong>Admin:</strong> scheduler_admin / AdminScheduler2024!</p>
+                <p><strong>Demo User:</strong> demo_user / DemoUser2024!</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Don't have an account?{' '}
+                <Link href="/signup" className="text-blue-600 dark:text-blue-400 hover:underline">
+                  Sign up
+                </Link>
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

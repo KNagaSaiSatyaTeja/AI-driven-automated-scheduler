@@ -78,28 +78,28 @@ const requireAdmin = (req: AuthenticatedRequest, res: Response, next: NextFuncti
 export async function registerRoutes(app: Express): Promise<Server> {
   setupSession(app);
 
-  // Create default admin user
+  // Create default admin user for AI-driven automated scheduler
   try {
-    const existingAdmin = await storage.getUserByUsername('admin');
+    const existingAdmin = await storage.getUserByUsername('scheduler_admin');
     if (!existingAdmin) {
       await storage.createUser({
-        username: 'admin',
-        email: 'admin@example.com',
-        password: 'admin123',
+        username: 'scheduler_admin',
+        email: 'admin@scheduler.ai',
+        password: 'AdminScheduler2024!',
         role: 'admin'
       });
-      console.log('Default admin user created: admin / admin123');
+      console.log('AI Scheduler Admin created: scheduler_admin / AdminScheduler2024!');
     }
 
-    const existingUser = await storage.getUserByUsername('user');
+    const existingUser = await storage.getUserByUsername('demo_user');
     if (!existingUser) {
       await storage.createUser({
-        username: 'user',
-        email: 'user@example.com',
-        password: 'user123',
+        username: 'demo_user',
+        email: 'demo@scheduler.ai',
+        password: 'DemoUser2024!',
         role: 'user'
       });
-      console.log('Default user created: user / user123');
+      console.log('Demo user created: demo_user / DemoUser2024!');
     }
   } catch (error) {
     console.log('Default users may already exist');

@@ -49,7 +49,7 @@ class DatabaseManager {
         if (!this.mongoServer) {
           this.mongoServer = await MongoMemoryServer.create({
             instance: {
-              dbName: 'room-scheduler'
+              dbName: 'ai-automated-scheduler'
             }
           });
         }
