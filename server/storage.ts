@@ -306,21 +306,23 @@ export class MongoStorage implements IStorage {
       name: s.name,
       duration: s.duration,
       no_of_classes_per_week: s.no_of_classes_per_week,
-      facultyId: s.facultyId,
+      faculty: s.faculty || [],
       createdAt: s.createdAt
     }));
   }
 
   async createSubject(subject: InsertSubject): Promise<SubjectRecord> {
     await this.initializeConnection();
+    console.log('Creating subject with data:', subject);
     const newSubject = new SubjectModel(subject);
     const saved = await newSubject.save();
+    console.log('Saved subject:', saved.toObject());
     return {
       _id: saved._id.toString(),
       name: saved.name,
       duration: saved.duration,
       no_of_classes_per_week: saved.no_of_classes_per_week,
-      facultyId: saved.facultyId,
+      faculty: saved.faculty || [],
       createdAt: saved.createdAt
     };
   }
@@ -335,7 +337,7 @@ export class MongoStorage implements IStorage {
       name: updated.name,
       duration: updated.duration,
       no_of_classes_per_week: updated.no_of_classes_per_week,
-      facultyId: updated.facultyId,
+      faculty: updated.faculty || [],
       createdAt: updated.createdAt
     };
   }
