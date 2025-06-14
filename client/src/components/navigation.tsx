@@ -14,16 +14,11 @@ export default function Navigation() {
   const navItems = isAdmin 
     ? [
         { path: "/", label: "Dashboard", icon: Calendar },
-        { path: "/faculty", label: "Faculty", icon: Users },
-        { path: "/subjects", label: "Subjects", icon: BookOpen },
-        { path: "/breaks", label: "Breaks", icon: Coffee },
-        { path: "/college-time", label: "College Time", icon: Clock },
-        { path: "/generate", label: "Generate Schedule", icon: Upload },
+        { path: "/admin", label: "Admin Panel", icon: Settings },
+        { path: "/generate-schedule", label: "Generate Schedule", icon: Upload },
       ]
     : [
         { path: "/", label: "Dashboard", icon: Eye },
-        { path: "/faculty", label: "Faculty", icon: Users },
-        { path: "/subjects", label: "Subjects", icon: BookOpen },
         { path: "/schedule", label: "View Schedule", icon: Calendar },
       ];
 
@@ -33,7 +28,7 @@ export default function Navigation() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-8">
             <Link href="/" className="text-xl font-bold">
-              Room Scheduler
+              AI-driven automated scheduler
             </Link>
             
             <div className="hidden md:flex items-center space-x-6">

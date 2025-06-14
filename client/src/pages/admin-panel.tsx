@@ -230,28 +230,46 @@ export default function AdminPanel() {
         </div>
 
         <Tabs defaultValue="faculty" className="space-y-6">
-          <TabsList className="bg-gray-100 dark:bg-gray-900 w-full justify-start flex-wrap h-auto p-2 gap-2">
-            <TabsTrigger value="faculty" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
+          <TabsList className="bg-gray-200 dark:bg-gray-800 w-full justify-start flex-wrap h-auto p-3 gap-3 border border-gray-300 dark:border-gray-600">
+            <TabsTrigger 
+              value="faculty" 
+              className="bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 dark:data-[state=active]:bg-blue-900/40 dark:data-[state=active]:text-blue-200 px-4 py-2 font-medium"
+            >
               <Users className="w-4 h-4 mr-2 text-blue-600" />
               Faculty
             </TabsTrigger>
-            <TabsTrigger value="subjects" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
+            <TabsTrigger 
+              value="subjects" 
+              className="bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-green-50 dark:hover:bg-green-900/20 data-[state=active]:bg-green-100 data-[state=active]:text-green-800 dark:data-[state=active]:bg-green-900/40 dark:data-[state=active]:text-green-200 px-4 py-2 font-medium"
+            >
               <BookOpen className="w-4 h-4 mr-2 text-green-600" />
               Subjects
             </TabsTrigger>
-            <TabsTrigger value="rooms" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
+            <TabsTrigger 
+              value="rooms" 
+              className="bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-800 dark:data-[state=active]:bg-purple-900/40 dark:data-[state=active]:text-purple-200 px-4 py-2 font-medium"
+            >
               <Building className="w-4 h-4 mr-2 text-purple-600" />
               Rooms
             </TabsTrigger>
-            <TabsTrigger value="breaks" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
+            <TabsTrigger 
+              value="breaks" 
+              className="bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-800 dark:data-[state=active]:bg-orange-900/40 dark:data-[state=active]:text-orange-200 px-4 py-2 font-medium"
+            >
               <Coffee className="w-4 h-4 mr-2 text-orange-600" />
               Breaks
             </TabsTrigger>
-            <TabsTrigger value="college-time" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
+            <TabsTrigger 
+              value="college-time" 
+              className="bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20 data-[state=active]:bg-red-100 data-[state=active]:text-red-800 dark:data-[state=active]:bg-red-900/40 dark:data-[state=active]:text-red-200 px-4 py-2 font-medium"
+            >
               <Clock className="w-4 h-4 mr-2 text-red-600" />
               College Time
             </TabsTrigger>
-            <TabsTrigger value="scheduler" className="text-black dark:text-white data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:bg-black dark:data-[state=active]:text-white flex-shrink-0">
+            <TabsTrigger 
+              value="scheduler" 
+              className="bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-800 dark:data-[state=active]:bg-indigo-900/40 dark:data-[state=active]:text-indigo-200 px-4 py-2 font-medium"
+            >
               <Calendar className="w-4 h-4 mr-2 text-indigo-600" />
               Scheduler
             </TabsTrigger>
