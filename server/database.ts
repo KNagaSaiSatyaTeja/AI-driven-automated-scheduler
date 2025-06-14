@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 
 class DatabaseManager {
   private static instance: DatabaseManager;
-  private mongoServer: MongoMemoryServer | null = null;
   private isConnected = false;
   private connecting = false;
+  private mongoServer: any = null;
 
   private constructor() {}
 
@@ -38,8 +37,15 @@ class DatabaseManager {
         this.isConnected = false;
       }
 
-      // Use MongoDB Memory Server for development
-      if (process.env.NODE_ENV === 'development') {
+      // Use actual MongoDB URI - fallback to memory server if no URI provided
+      const MONGODB_URI = process.env.MONGODB_URI;
+      
+      if (MONGODB_URI) {
+        await mongoose.connect(MONGODB_URI);
+        console.log('Connected to MongoDB:', MONGODB_URI.replace(/\/\/.*@/, '//***:***@'));
+      } else {
+        // Fallback to memory server for development
+        const { MongoMemoryServer } = await import('mongodb-memory-server');
         if (!this.mongoServer) {
           this.mongoServer = await MongoMemoryServer.create({
             instance: {
@@ -49,12 +55,7 @@ class DatabaseManager {
         }
         const uri = this.mongoServer.getUri();
         await mongoose.connect(uri);
-        console.log('Connected to MongoDB Memory Server');
-      } else {
-        // Use actual MongoDB URI in production
-        const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/room-scheduler';
-        await mongoose.connect(MONGODB_URI);
-        console.log('Connected to MongoDB');
+        console.log('Connected to MongoDB Memory Server (fallback)');
       }
 
       this.isConnected = true;
@@ -69,10 +70,6 @@ class DatabaseManager {
 
   async disconnect() {
     try {
-      if (this.mongoServer) {
-        await this.mongoServer.stop();
-        this.mongoServer = null;
-      }
       await mongoose.disconnect();
       this.isConnected = false;
       console.log('Disconnected from MongoDB');
