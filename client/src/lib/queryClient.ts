@@ -9,7 +9,7 @@ async function throwIfResNotOk(res: Response) {
 
 export async function apiRequest(
   url: string,
-  options?: RequestInit,
+  options?: RequestInit & { body?: any },
 ): Promise<any> {
   const token = localStorage.getItem('token');
   const headers: HeadersInit = {
@@ -18,11 +18,18 @@ export async function apiRequest(
     ...(options?.headers || {}),
   };
 
-  const res = await fetch(url, {
+  const requestOptions: RequestInit = {
     ...options,
     headers,
     credentials: "include",
-  });
+  };
+
+  // Properly serialize the body if it exists
+  if (options?.body && typeof options.body !== 'string') {
+    requestOptions.body = JSON.stringify(options.body);
+  }
+
+  const res = await fetch(url, requestOptions);
 
   await throwIfResNotOk(res);
   return await res.json();

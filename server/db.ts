@@ -1,8 +1,21 @@
-// MongoDB connection is handled by server/database.ts
-// This file is kept for compatibility but uses MongoDB exclusively
-import { connectToDatabase } from './database';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import * as schema from './schema';
 
-// Initialize MongoDB connection
-export const initializeDatabase = async () => {
-  await connectToDatabase();
-};
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export const db = drizzle(pool, { schema });
+
+export async function initializeDatabase() {
+  try {
+    // Test the connection
+    const client = await pool.connect();
+    client.release();
+    console.log('Connected to PostgreSQL database');
+  } catch (error) {
+    console.error('Database connection error:', error);
+    throw error;
+  }
+}
