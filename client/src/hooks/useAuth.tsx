@@ -58,9 +58,14 @@ export function useAuth() {
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      setLocation('/dashboard');
+      // Redirect admin users to admin panel, regular users to dashboard
+      if (data.user?.role === 'admin') {
+        setLocation('/admin');
+      } else {
+        setLocation('/dashboard');
+      }
     },
   });
 
@@ -81,9 +86,14 @@ export function useAuth() {
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      setLocation('/dashboard');
+      // Redirect admin users to admin panel, regular users to dashboard
+      if (data.user?.role === 'admin') {
+        setLocation('/admin');
+      } else {
+        setLocation('/dashboard');
+      }
     },
   });
 
